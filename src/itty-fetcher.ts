@@ -14,9 +14,7 @@ type FetchyFunction = <T>(
   options?: object | undefined
 ) => Promise<T>
 
-type FetchTraps = {
-  [key: string]: FetchyFunction
-}
+type FetchTraps = Record<string, FetchyFunction>
 
 type FetcherType = FetcherOptions & {
   get: FetchyFunction
