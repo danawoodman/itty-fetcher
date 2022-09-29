@@ -16,8 +16,9 @@
   "scripts": {
     "lint": "eslint src",
     "test": "vitest",
+    "test:once": "vitest run",
     "coverage": "vitest run --coverage",
-    "verify": "echo 'verifying module...' && yarn test && yarn build",
+    "verify": "echo 'verifying module...' && run-s test:once build",
     "dev": "run-p dev:*",
     "dev:lint": "onchange -ik 'src/**/*.ts' -- yarn lint",
     "dev:test": "yarn test --watch",
