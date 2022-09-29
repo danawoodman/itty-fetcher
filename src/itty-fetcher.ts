@@ -1,11 +1,11 @@
 interface FetcherOverrides {
-  base?: string,
-  autoParse?: boolean,
+  base?: string
+  autoParse?: boolean
 }
 
 interface FetcherOptions {
-  base: string,
-  autoParse: boolean,
+  base: string
+  autoParse: boolean
 }
 
 type FetchyFunction = <T>(
@@ -19,68 +19,67 @@ type FetchTraps = {
 }
 
 type FetcherType = FetcherOptions & {
-  get: FetchyFunction,
-  post: FetchyFunction,
-  put: FetchyFunction,
+  get: FetchyFunction
+  post: FetchyFunction
+  put: FetchyFunction
   delete: FetchyFunction
 } & FetchTraps
 
 type FetchyOptions = {
-  method: string,
+  method: string
 } & FetcherOptions
 
-type FetchOptions = {
-  headers?: HeadersInit,
-  [key: string]: string | boolean | object,
-}
+const fetchy =
+  (options: FetchyOptions): FetchyFunction =>
+  (
+    url: string,
+    payload?: string | number | object | undefined,
+    fetchOptions?: RequestInit
+  ) => {
+    const { base, autoParse, method: rawMethod } = options
 
-const fetchy = (options: FetchyOptions): FetchyFunction => (
-  url: string,
-  payload?: string | number | object | undefined,
-  fetchOptions?: FetchOptions,
-) => {
-  const {
-    base,
-    autoParse,
-    method,
-  } = options
+    const method = rawMethod.toUpperCase()
 
-  return fetch(base + url, {
-    method: method.toUpperCase(),
-    ...fetchOptions,
-    headers: {
-      'Content-Type': 'application/json',
-      ...fetchOptions?.headers,
-    },
-    body: JSON.stringify(payload),
-  })
-  .then(response => {
-    if (response.ok) {
-      if (!autoParse) return response
+    const resolvedURL = new URL(base + url)
 
-      const contentType = response.headers.get('content-type')
-
-      return contentType.includes('json')
-              ? response.json()
-              : response.text()
+    if (method === 'GET' && payload && typeof payload === 'object') {
+      resolvedURL.search = new URLSearchParams(
+        payload as Record<string, string>
+      ).toString()
+      payload = undefined
     }
 
-    throw new Error(response.statusText)
-  })
-}
+    return fetch(resolvedURL.toString(), {
+      method,
+      ...fetchOptions,
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions?.headers,
+      },
+      body: JSON.stringify(payload),
+    }).then((response) => {
+      if (response.ok) {
+        if (!autoParse) return response
+
+        const contentType = response.headers.get('content-type')
+
+        return contentType.includes('json') ? response.json() : response.text()
+      }
+
+      throw new Error(response.statusText)
+    })
+  }
 
 export function fetcher(fetcherOptions?: FetcherOverrides) {
-  return <FetcherType>new Proxy({
-    base: '',
-    autoParse: true,
-    ...fetcherOptions,
-  }, {
-    get: (obj, prop: string) =>
-      obj[prop] !== undefined
-      ? obj[prop]
-      : fetchy({
-          method: prop,
-          ...obj,
-        })
-  })
+  return <FetcherType>new Proxy(
+    {
+      base: '',
+      autoParse: true,
+      ...fetcherOptions,
+    },
+    {
+      get: (obj, method: string) =>
+        obj[method] !== undefined ? obj[method] : fetchy({ method, ...obj }),
+    }
+  )
 }
