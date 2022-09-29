@@ -114,6 +114,19 @@ describe('fetcher', () => {
       expect(response).toEqual(JSON_RESPONSE)
     })
 
+    it('handles array data passed to API', async () => {
+      const url = 'https://google.com'
+      const data = ['a', 'b', 'c']
+
+      const mock = fetchMock.post(url, data)
+
+      await fetcher().post(url, data)
+
+      const [_, expected] = mock.calls()[0]
+      if (typeof expected?.body === 'string')
+        expect(data).toEqual(JSON.parse(expected.body))
+    })
+
     it('passes data for GET requests into query params', async () => {
       const url = 'https://google.com'
       const api = fetcher()

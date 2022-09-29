@@ -31,14 +31,11 @@ const fetchy =
   (options: FetchyOptions): FetchyFunction =>
   (
     url: string,
-    payload?: string | number | object | undefined,
+    payload?: string | number | object | any[] | undefined,
     fetchOptions?: RequestInit
   ) => {
-    const { base, autoParse, method: rawMethod } = options
-
-    const method = rawMethod.toUpperCase()
-
-    const resolvedURL = new URL(base + url)
+    const method = options.method.toUpperCase()
+    const resolvedURL = new URL(options.base + url)
 
     /**
      * If the request is a `.get(...)` then we want to pass the payload
@@ -63,7 +60,7 @@ const fetchy =
       body: JSON.stringify(payload),
     }).then((response) => {
       if (response.ok) {
-        if (!autoParse) return response
+        if (!options.autoParse) return response
 
         const contentType = response.headers.get('content-type')
 
