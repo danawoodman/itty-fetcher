@@ -73,11 +73,7 @@ const fetchy =
 
 export function fetcher(fetcherOptions?: FetcherOverrides) {
   return <FetcherType>new Proxy(
-    {
-      base: '',
-      autoParse: true,
-      ...fetcherOptions,
-    },
+    { base: '', autoParse: true, ...fetcherOptions },
     {
       get: (obj, method: string) =>
         obj[method] !== undefined ? obj[method] : fetchy({ method, ...obj }),
