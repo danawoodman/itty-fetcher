@@ -14,11 +14,13 @@
     }
   },
   "scripts": {
-    "lint": "npx eslint src",
+    "lint": "eslint src",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "verify": "echo 'verifying module...' && yarn test && yarn build",
-    "dev": "yarn lint && jest --watch src",
+    "dev": "run-p dev:*",
+    "dev:lint": "onchange -ik 'src/**/*.ts' -- yarn lint",
+    "dev:test": "yarn test --watch",
     "coveralls": "yarn coverage && cat ./coverage/lcov.info | coveralls",
     "prerelease": "yarn verify",
     "prebuild": "rimraf dist && mkdir dist",
