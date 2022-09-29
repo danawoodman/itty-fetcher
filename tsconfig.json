@@ -6,10 +6,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "inlineSourceMap": false,
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "listEmittedFiles": false,
     "listFiles": false,
     "moduleResolution": "node",
@@ -20,7 +17,6 @@
     "skipLibCheck": true,
     "strict": false,
     "traceResolution": false,
-    "types": ["@types/jest"],
     "module": "esnext",
     "outDir": "dist/mjs",
     "target": "esnext"
